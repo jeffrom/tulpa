@@ -1,3 +1,4 @@
+// Package server contains tulpa's logic.
 package server
 
 import (

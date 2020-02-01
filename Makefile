@@ -26,8 +26,9 @@ test:
 	GO111MODULE=on go test -cover -race ./...
 
 .PHONY: test.lint
-test.lint: $(staticcheck)
-	staticcheck -f stylish ./...
+test.lint: $(staticcheck) $(golangcilint)
+	staticcheck -f stylish -checks all ./...
+	GO111MODULE=on golangci-lint run --deadline 2m
 
 .PHONY: test.cover
 test.cover: $(gocoverutil)

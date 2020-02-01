@@ -1,3 +1,4 @@
+// Package cmd contains the command-line configuration of tulpa.
 package cmd
 
 import (
