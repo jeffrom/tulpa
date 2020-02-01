@@ -38,6 +38,10 @@ test.cover: $(gocoverutil)
 test.outdated: $(gomodoutdated)
 	GO111MODULE=on go list -u -m -json all | go-mod-outdated -direct
 
+.PHONY: release.dryrun
+release.dryrun:
+	goreleaser --snapshot --skip-publish --rm-dist
+
 $(gocoverutil):
 	GO111MODULE=off go get github.com/AlekSi/gocoverutil
 

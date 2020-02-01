@@ -26,6 +26,7 @@ func newRootCmd() *cobra.Command {
 		},
 		Version: version,
 	}
+	rootCmd.SetVersionTemplate("{{.Version}}\n")
 
 	flags := rootCmd.Flags()
 	flags.IntVarP(&cfg.AppPort, "app-port", "a", 3000, "application port")
