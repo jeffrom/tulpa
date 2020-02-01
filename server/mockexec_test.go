@@ -25,7 +25,11 @@ func fakeProcess() {
 	codes := os.Getenv("_FAKEPROC_EXITCODE")
 	code, err := strconv.ParseInt(codes, 10, 8)
 	if err != nil {
-		panic(err)
+		if codes == "" {
+			code = 0
+		} else {
+			panic(err)
+		}
 	}
 	defer os.Exit(int(code))
 

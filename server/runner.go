@@ -17,6 +17,7 @@ type runner struct {
 	errors chan error
 	cmd    *exec.Cmd
 	stderr *bytes.Buffer
+	env    []string // for testing
 }
 
 func newRunner(cfg *Config, args []string) *runner {
@@ -52,6 +53,7 @@ func (r *runner) execute() error {
 	mw := io.MultiWriter(r.stderr, os.Stderr)
 
 	r.cmd = execCommand(context.TODO(), "/bin/sh", "-c", strings.Join(r.args, " "))
+	r.cmd.Env = append(r.cmd.Env, r.env...)
 	r.cmd.Stdout = os.Stdout
 	r.cmd.Stderr = mw
 
@@ -75,7 +77,11 @@ func (r *runner) wait() error {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			ws := exiterr.Sys().(syscall.WaitStatus)
 			if ws.ExitStatus() > 0 {
-				err = errors.New(r.stderr.String())
+				errStr := r.stderr.String()
+				if errStr == "" {
+					errStr = "non-zero exit (but no output) from subprocess"
+				}
+				err = errors.New(errStr)
 
 				if r.cfg.Wait {
 					return err
