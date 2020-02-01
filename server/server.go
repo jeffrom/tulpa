@@ -2,7 +2,6 @@
 package server
 
 import (
-	"log"
 	"net"
 	"time"
 
@@ -70,7 +69,7 @@ func (s *Server) start(stop chan error, ready chan error) error {
 			debounced(func() {
 				modified := s.watcher.scan()
 				if modified {
-					log.Printf("server: fs modified, rerunning...")
+					s.cfg.Print("server: fs modified, rerunning...")
 
 					if err := s.runner.run(); err != nil {
 						s.proxy.setError(err)
@@ -85,7 +84,7 @@ func (s *Server) start(stop chan error, ready chan error) error {
 			s.proxy.unpause <- struct{}{}
 
 		case err := <-s.runner.errors:
-			log.Print("runner: error")
+			s.cfg.Print("runner: error")
 			s.proxy.setError(err)
 		case err := <-stop:
 			s.Stop()

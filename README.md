@@ -7,7 +7,8 @@ will automatically rerun your command if the filesystem has changed.
 `tulpa` is language agnostic - it can be configured to work with anything: Go,
 Rust, Ruby, Python, scripts, and arbitrary commands.
 
-tulpa is a fork of [tychus](https://github.com/devlocker/tychus).  Thanks to
+tulpa is a fork of [tychus](https://github.com/devlocker/tychus). tulpa adds
+some output formatting, debounce, and other bells and whistles. Thanks to
 [@PatKoperwas](https://github.com/PatKoperwas) for the great work!
 
 ## Installation

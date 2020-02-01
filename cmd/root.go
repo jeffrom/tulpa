@@ -47,6 +47,7 @@ func Execute() {
 }
 
 func start(cfg *server.Config, args []string) error {
+	cfg.Initialize()
 	stop := make(chan os.Signal, 1)
 	signal.Notify(
 		stop,

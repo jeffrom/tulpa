@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -81,6 +82,9 @@ func newTestConfig() *Config {
 	return &Config{
 		AppPort: 0,
 		Timeout: 1 * time.Second,
+		// TODO can test output this way
+		stdout: os.Stdout,
+		stderr: os.Stderr,
 	}
 }
 

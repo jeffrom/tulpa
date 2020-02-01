@@ -64,7 +64,7 @@ func (p *proxy) start(ready chan error) error {
 		ready <- nil
 	}
 
-	log.Printf("Proxying requests on %s to :%d", ln.Addr(), p.cfg.AppPort)
+	p.cfg.Printf("Proxying requests on %s to :%d", ln.Addr(), p.cfg.AppPort)
 	return srv.Serve(ln)
 }
 
@@ -93,7 +93,7 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-time.After(50 * time.Millisecond):
 		case <-ctx.Done():
-			log.Print("Timeout reached")
+			p.cfg.Print("Timeout reached")
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte("Connection Refused\n"))
 			return
@@ -120,7 +120,7 @@ func (p *proxy) forward(w http.ResponseWriter, r *http.Request, body string) boo
 }
 
 func (p *proxy) setError(err error) {
-	log.Printf("proxy: error mode")
+	p.cfg.Print("proxy: error mode")
 	p.errStr = err.Error()
 }
 

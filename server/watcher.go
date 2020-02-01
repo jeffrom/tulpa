@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,7 +23,7 @@ func newWatcher(cfg *Config) *watcher {
 }
 
 func (w *watcher) scan() bool {
-	log.Print("watcher: start")
+	w.cfg.Debug("start scan")
 	start := time.Now()
 
 	modified := walk.Walk(".", func(path string, info os.FileInfo, err error) error {
@@ -33,14 +32,14 @@ func (w *watcher) scan() bool {
 		}
 
 		if info.ModTime().After(w.lastRun) {
-			log.Printf("Watcher: Found modified file: %v", path)
+			w.cfg.Debugf("found modified file: %v", path)
 			return errors.New(path)
 		}
 
 		return nil
 	})
 
-	log.Printf("Watcher: Scan finished: %v", time.Since(start))
+	w.cfg.Printf("scan finished in %v", time.Since(start))
 	return modified != nil
 }
 
