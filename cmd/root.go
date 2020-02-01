@@ -33,6 +33,7 @@ func newRootCmd() *cobra.Command {
 	flags.IntVarP(&cfg.AppPort, "app-port", "a", 3000, "application port")
 	flags.IntVarP(&cfg.ProxyPort, "proxy-port", "p", 4000, "proxy port")
 	flags.DurationVar(&cfg.Timeout, "timeout", 10*time.Second, "request timeout")
+	flags.DurationVar(&cfg.Debounce, "debounce", 300*time.Millisecond, "file watch debounce interval")
 	flags.StringArrayVarP(&cfg.IgnoreDirs, "ignore", "x", []string{"node_modules", "log", "tmp", "vendor"}, "directories to ignore")
 	flags.BoolVarP(&cfg.Wait, "wait", "w", false, "wait for command to finish before serving request")
 	return rootCmd

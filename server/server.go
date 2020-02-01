@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"time"
+
+	"github.com/bep/debounce"
 )
 
 type Server struct {
@@ -60,23 +62,26 @@ func (s *Server) start(stop chan error, ready chan error) error {
 		s.proxy.setError(err)
 	}
 
+	debounced := debounce.New(s.cfg.Debounce)
+
 	for {
 		select {
 		case <-s.proxy.requests:
-			modified := s.watcher.scan()
-			if modified {
-				log.Printf("server: fs modified, rerunning...")
+			debounced(func() {
+				modified := s.watcher.scan()
+				if modified {
+					log.Printf("server: fs modified, rerunning...")
 
-				if err := s.runner.run(); err != nil {
-					s.proxy.setError(err)
-					s.proxy.unpause <- struct{}{}
-					continue
+					if err := s.runner.run(); err != nil {
+						s.proxy.setError(err)
+						return
+					}
+
+					s.proxy.clearError()
 				}
 
-				s.proxy.clearError()
-			}
-
-			s.watcher.lastRun = time.Now()
+				s.watcher.lastRun = time.Now()
+			})
 			s.proxy.unpause <- struct{}{}
 
 		case err := <-s.runner.errors:
