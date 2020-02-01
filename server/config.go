@@ -7,5 +7,6 @@ type Config struct {
 	ProxyPort  int
 	IgnoreDirs []string
 	Timeout    time.Duration
+	Wait       bool
 	Verbose    bool
 }
