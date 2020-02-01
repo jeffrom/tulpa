@@ -12,11 +12,14 @@ gomodoutdated := $(GOPATH)/bin/go-mod-outdated
 
 all: build
 
-.PHONY: build
 build: $(tulpa_bin)
 
 $(tulpa_bin): $(gofiles)
 	GO111MODULE=on go install ./...
+
+.PHONY: clean
+clean:
+	git clean -x -f
 
 .PHONY: test
 test:
