@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/MichaelTJones/walk"
@@ -13,6 +14,7 @@ import (
 type watcher struct {
 	cfg     *Config
 	lastRun time.Time
+	mu      sync.Mutex
 }
 
 func newWatcher(cfg *Config) *watcher {
@@ -31,7 +33,7 @@ func (w *watcher) scan() bool {
 			return walk.SkipDir
 		}
 
-		if info.ModTime().After(w.lastRun) {
+		if info.ModTime().After(w.getLastRun()) {
 			w.cfg.Debugf("found modified file: %v", path)
 			return errors.New(path)
 		}
@@ -39,8 +41,20 @@ func (w *watcher) scan() bool {
 		return nil
 	})
 
-	w.cfg.Printf("scan finished in %v", time.Since(start))
+	w.cfg.Printf("scan done in %v", time.Since(start))
 	return modified != nil
+}
+
+func (w *watcher) getLastRun() time.Time {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.lastRun
+}
+
+func (w *watcher) setLastRun(t time.Time) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.lastRun = t
 }
 
 // Checks to see if this directory should be watched. Don't want to watch

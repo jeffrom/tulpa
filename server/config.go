@@ -21,10 +21,13 @@ type Config struct {
 	IgnoreDirs []string
 	Timeout    time.Duration
 	Debounce   time.Duration
-	Wait       bool
-	Verbose    bool
-	stdout     io.Writer
-	stderr     io.Writer
+	// DebouncePoll is the interval between watches while the request debouncer
+	// is saturated. It will be disabled if <= 0.
+	DebouncePoll time.Duration
+	Wait         bool
+	Verbose      bool
+	stdout       io.Writer
+	stderr       io.Writer
 }
 
 func (c *Config) Initialize() {

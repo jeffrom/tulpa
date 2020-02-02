@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"syscall"
 )
 
@@ -18,6 +19,7 @@ type runner struct {
 	cmd    *exec.Cmd
 	stderr *bytes.Buffer
 	env    []string // for testing
+	mu     sync.Mutex
 }
 
 func newRunner(cfg *Config, args []string) *runner {
@@ -45,6 +47,8 @@ func (r *runner) run() error {
 }
 
 func (r *runner) execute() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	if r.cmd != nil && r.cmd.ProcessState != nil && r.cmd.ProcessState.Exited() {
 		return nil
 	}
@@ -71,6 +75,8 @@ func (r *runner) execute() error {
 // it if it exit status is postive, as status code -1 is returned when the
 // process was killed by runner#kill.
 func (r *runner) wait() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	err := r.cmd.Wait()
 
 	if err != nil {
@@ -97,6 +103,8 @@ func (r *runner) wait() error {
 
 // Kill the existing process & process group
 func (r *runner) kill() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	if r.cmd != nil && r.cmd.Process != nil {
 		if pgid, err := syscall.Getpgid(r.cmd.Process.Pid); err == nil {
 			syscall.Kill(-pgid, syscall.SIGKILL)

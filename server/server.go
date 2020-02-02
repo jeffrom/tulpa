@@ -4,8 +4,6 @@ package server
 import (
 	"net"
 	"time"
-
-	"github.com/bep/debounce"
 )
 
 type Server struct {
@@ -61,26 +59,12 @@ func (s *Server) start(stop chan error, ready chan error) error {
 		s.proxy.setError(err)
 	}
 
-	debounced := debounce.New(s.cfg.Debounce)
+	debounced := newDebouncer(s.cfg)
 
 	for {
 		select {
 		case <-s.proxy.requests:
-			debounced(func() {
-				modified := s.watcher.scan()
-				if modified {
-					s.cfg.Print("server: fs modified, rerunning...")
-
-					if err := s.runner.run(); err != nil {
-						s.proxy.setError(err)
-						return
-					}
-
-					s.proxy.clearError()
-				}
-
-				s.watcher.lastRun = time.Now()
-			})
+			debounced(s.doScan)
 			s.proxy.unpause <- struct{}{}
 
 		case err := <-s.runner.errors:
@@ -91,6 +75,22 @@ func (s *Server) start(stop chan error, ready chan error) error {
 			return err
 		}
 	}
+}
+
+func (s *Server) doScan() {
+	modified := s.watcher.scan()
+	if modified {
+		s.cfg.Print("fs modified, rerunning...")
+
+		if err := s.runner.run(); err != nil {
+			s.proxy.setError(err)
+			return
+		}
+
+		s.proxy.clearError()
+	}
+
+	s.watcher.setLastRun(time.Now())
 }
 
 func (s *Server) Stop() {

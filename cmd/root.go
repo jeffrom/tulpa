@@ -20,7 +20,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "tulpa",
 		Short: "Development proxy with reload-after-change semantics",
-		Long:  `Tulpa is a command line utility for live reloading applications.`,
+		Long:  `tulpa is a command line utility for live reloading applications.`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return start(cfg, args)
@@ -33,7 +33,8 @@ func newRootCmd() *cobra.Command {
 	flags.IntVarP(&cfg.AppPort, "app-port", "a", 3000, "application port")
 	flags.IntVarP(&cfg.ProxyPort, "proxy-port", "p", 4000, "proxy port")
 	flags.DurationVar(&cfg.Timeout, "timeout", 10*time.Second, "request timeout")
-	flags.DurationVar(&cfg.Debounce, "debounce", 300*time.Millisecond, "file watch debounce interval")
+	flags.DurationVar(&cfg.Debounce, "debounce", 200*time.Millisecond, "file watch debounce interval")
+	flags.DurationVar(&cfg.DebouncePoll, "debounce-poll", 1*time.Second, "poll interval while debounce is saturated")
 	flags.StringArrayVarP(&cfg.IgnoreDirs, "ignore", "x", []string{"node_modules", "log", "tmp", "vendor"}, "directories to ignore")
 	flags.BoolVarP(&cfg.Wait, "wait", "w", false, "wait for command to finish before serving request")
 	return rootCmd

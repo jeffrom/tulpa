@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -88,6 +89,17 @@ func newTestConfig() *Config {
 	}
 }
 
+func newTestConfigOutErr() (*Config, *bytes.Buffer, *bytes.Buffer) {
+	cfg := newTestConfig()
+	// stdout := &lockBuffer{Buffer: &bytes.Buffer{}}
+	// stderr := &lockBuffer{Buffer: &bytes.Buffer{}}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cfg.stdout = stdout
+	cfg.stderr = stderr
+	return cfg, stdout, stderr
+}
+
 func newTestServer(cfg *Config, args ...string) (*Server, chan error) {
 	s := New(cfg, args)
 	errC := s.GoStart()
@@ -112,3 +124,26 @@ func newTestAppServer(cfg *Config, fn http.HandlerFunc) *httptest.Server {
 	cfg.AppPort = port
 	return srv
 }
+
+func newTestCase(cfg *Config, fn http.HandlerFunc, args ...string) (*httptest.Server, *Server, chan error) {
+	app := newTestAppServer(cfg, fn)
+	srv, errC := newTestServer(cfg, args...)
+	return app, srv, errC
+}
+
+// type lockBuffer struct {
+// 	*bytes.Buffer
+// 	mu sync.Mutex
+// }
+
+// func (b *lockBuffer) Write(p []byte) (int, error) {
+// 	b.mu.Lock()
+// 	defer b.mu.Unlock()
+// 	return b.Buffer.Write(p)
+// }
+
+// func (b *lockBuffer) Read(p []byte) (int, error) {
+// 	b.mu.Lock()
+// 	defer b.mu.Unlock()
+// 	return b.Buffer.Read(p)
+// }
