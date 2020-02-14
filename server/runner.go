@@ -122,6 +122,7 @@ func (r *runner) kill() {
 
 		ignoreError(syscall.Kill(-r.pid, syscall.SIGKILL))
 
+		r.pid = -1
 		r.mu.Lock()
 		r.cmd = nil
 		r.mu.Unlock()
