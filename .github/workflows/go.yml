@@ -26,9 +26,11 @@ jobs:
 
     - name: Build
       run: go build -v .
-    
+
     - name: Test
       run: make test.cover
-    
+
     - name: Lint
       run: make test.lint
+      env:
+        PATH: $PATH:$HOME/go/bin
