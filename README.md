@@ -1,3 +1,5 @@
+![Go](https://github.com/jeffrom/tulpa/workflows/Go/badge.svg)
+
 # tulpa
 
 tulpa is a command line utility for live reloading applications. tulpa serves
