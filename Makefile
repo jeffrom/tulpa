@@ -46,6 +46,10 @@ test.outdated: $(gomodoutdated)
 release.dryrun:
 	goreleaser --snapshot --skip-publish --rm-dist
 
+.PHONY: release
+release:
+	goreleaser --rm-dist
+
 $(gocoverutil):
 	GO111MODULE=off go get github.com/AlekSi/gocoverutil
 
