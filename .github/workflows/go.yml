@@ -32,5 +32,3 @@ jobs:
 
     - name: Lint
       run: make test.lint
-      env:
-        PATH: $PATH:$HOME/go/bin
