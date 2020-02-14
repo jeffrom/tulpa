@@ -1,7 +1,6 @@
 package server
 
 import (
-	"os"
 	"strings"
 	"testing"
 )
@@ -46,27 +45,27 @@ func TestRunnerFail(t *testing.T) {
 	}
 }
 
-func setEnv(environ []string) func() {
-	var unsetEnv []string
-	oldEnv := make(map[string]string)
-	for _, env := range environ {
-		parts := strings.SplitN(env, "=", 2)
-		k, v := parts[0], parts[1]
-		if _, ok := os.LookupEnv(k); !ok {
-			unsetEnv = append(unsetEnv, k)
-		} else {
-			oldEnv[k] = os.Getenv(k)
-		}
-		if err := os.Setenv(k, v); err != nil {
-			panic(err)
-		}
-	}
-	return func() {
-		for _, unset := range unsetEnv {
-			os.Unsetenv(unset)
-		}
-		for k, v := range oldEnv {
-			os.Setenv(k, v)
-		}
-	}
-}
+// func setEnv(environ []string) func() {
+// 	var unsetEnv []string
+// 	oldEnv := make(map[string]string)
+// 	for _, env := range environ {
+// 		parts := strings.SplitN(env, "=", 2)
+// 		k, v := parts[0], parts[1]
+// 		if _, ok := os.LookupEnv(k); !ok {
+// 			unsetEnv = append(unsetEnv, k)
+// 		} else {
+// 			oldEnv[k] = os.Getenv(k)
+// 		}
+// 		if err := os.Setenv(k, v); err != nil {
+// 			panic(err)
+// 		}
+// 	}
+// 	return func() {
+// 		for _, unset := range unsetEnv {
+// 			os.Unsetenv(unset)
+// 		}
+// 		for k, v := range oldEnv {
+// 			os.Setenv(k, v)
+// 		}
+// 	}
+// }

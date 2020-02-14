@@ -53,21 +53,21 @@ func fakeProcess() {
 	argsStr := argsString(args)
 	if expectArg := os.Getenv("_FAKEPROC_EXPECT_ARG"); expectArg != "" {
 		if argsStr != expectArg {
-			fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed:\nexpected: '%s',\n     got: '%s'", expectArg, argsStr)
+			fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed:\nexpected: '%s',\n     got: '%s'\n", expectArg, argsStr)
 			os.Exit(assertFailedCode)
 		}
 	}
 
 	if expectArg := os.Getenv("_FAKEPROC_EXPECT_ARG_SUFFIX"); expectArg != "" {
 		if !strings.HasSuffix(argsStr, expectArg) {
-			fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed:\nexpected suffix: '%s',\n     got: '%s'", expectArg, argsStr)
+			fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed:\nexpected suffix: '%s',\n     got: '%s'\n", expectArg, argsStr)
 			os.Exit(assertFailedCode)
 		}
 	}
 
 	if expectArg := os.Getenv("_FAKEPROC_EXPECT_ARG_SUFFIX"); expectArg != "" {
 		if match, err := regexp.MatchString(expectArg, argsStr); !match || err != nil {
-			fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed:\nexpected suffix: '%s',\n     got: '%s'\n(err: %v)", expectArg, argsStr, err)
+			fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed:\nexpected suffix: '%s',\n     got: '%s'\n(err: %v)\n", expectArg, argsStr, err)
 			os.Exit(assertFailedCode)
 		}
 	}
@@ -88,7 +88,7 @@ func fakeProcess() {
 	}
 
 	if expectSig && !gotSig {
-		fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed: expected SIGTERM/SIGINT")
+		fmt.Fprintf(os.Stderr, "fakeprocess: assertion failed: expected SIGTERM/SIGINT\n")
 		os.Exit(assertFailedCode)
 	}
 }

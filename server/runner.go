@@ -17,9 +17,11 @@ type runner struct {
 	args   []string
 	errors chan error
 	cmd    *exec.Cmd
+	pid    int
 	stderr *bytes.Buffer
 	env    []string // for testing
 	mu     sync.Mutex
+	stop   chan struct{}
 }
 
 func newRunner(cfg *Config, args []string) *runner {
@@ -27,6 +29,7 @@ func newRunner(cfg *Config, args []string) *runner {
 		cfg:    cfg,
 		args:   args,
 		errors: make(chan error),
+		stop:   make(chan struct{}),
 	}
 }
 
@@ -40,7 +43,9 @@ func (r *runner) run() error {
 	if r.cfg.Wait {
 		return r.wait()
 	} else {
-		go r.wait()
+		go func() {
+			ignoreError(r.wait())
+		}()
 	}
 
 	return nil
@@ -68,6 +73,7 @@ func (r *runner) execute() error {
 	if err := r.cmd.Start(); err != nil {
 		return errors.New(r.stderr.String())
 	}
+	r.pid = r.cmd.Process.Pid
 	return nil
 }
 
@@ -75,9 +81,15 @@ func (r *runner) execute() error {
 // it if it exit status is postive, as status code -1 is returned when the
 // process was killed by runner#kill.
 func (r *runner) wait() error {
+	select {
+	case <-r.stop:
+		return nil
+	default:
+	}
+
 	r.mu.Lock()
-	defer r.mu.Unlock()
 	err := r.cmd.Wait()
+	r.mu.Unlock()
 
 	if err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
@@ -103,15 +115,15 @@ func (r *runner) wait() error {
 
 // Kill the existing process & process group
 func (r *runner) kill() {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	if r.cmd != nil && r.cmd.Process != nil {
-		if pgid, err := syscall.Getpgid(r.cmd.Process.Pid); err == nil {
-			syscall.Kill(-pgid, syscall.SIGKILL)
+	if r.pid > 0 {
+		if pgid, err := syscall.Getpgid(r.pid); err == nil {
+			ignoreError(syscall.Kill(-pgid, syscall.SIGKILL))
 		}
 
-		syscall.Kill(-r.cmd.Process.Pid, syscall.SIGKILL)
+		ignoreError(syscall.Kill(-r.pid, syscall.SIGKILL))
 
+		r.mu.Lock()
 		r.cmd = nil
+		r.mu.Unlock()
 	}
 }

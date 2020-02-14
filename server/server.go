@@ -94,5 +94,8 @@ func (s *Server) doScan() {
 }
 
 func (s *Server) Stop() {
+	close(s.runner.stop)
 	s.runner.kill()
 }
+
+func ignoreError(err error) {}

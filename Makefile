@@ -32,7 +32,7 @@ test.lint: $(staticcheck) $(golangcilint)
 
 .PHONY: test.cover
 test.cover: $(gocoverutil)
-	gocoverutil -coverprofile=cover.out test -covermode=count ./... \
+	gocoverutil -coverprofile=cov.out test -covermode=count ./... \
 		2> >(grep -v "no packages being tested depend on matches for pattern" 1>&2) \
 		| sed -e 's/of statements in .*/of statements/'
 	# go tool cover -func cov.out

@@ -79,7 +79,8 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Failed to read request body\n"))
+		_, err := w.Write([]byte("Failed to read request body\n"))
+		ignoreError(err)
 		return
 	}
 
@@ -95,7 +96,8 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case <-ctx.Done():
 			p.cfg.Print("timeout reached")
 			w.WriteHeader(http.StatusBadGateway)
-			w.Write([]byte("Connection Refused\n"))
+			_, err := w.Write([]byte("Connection Refused\n"))
+			ignoreError(err)
 			return
 		}
 	}
@@ -104,7 +106,8 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (p *proxy) forward(w http.ResponseWriter, r *http.Request, body string) bool {
 	if len(p.errStr) > 0 {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(p.errStr))
+		_, err := w.Write([]byte(p.errStr))
+		ignoreError(err)
 		return true
 	}
 
