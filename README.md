@@ -15,18 +15,11 @@ some output formatting, debounce, and other bells and whistles. Thanks to
 
 ## Installation
 
-### Homebrew on macOS
-
-```
-brew tap devlocker/tap
-brew install tulpa
-```
-
 ### With Go
 Assuming you have a working Go environment and `GOPATH/bin` is in your `PATH`
 
 ```
-go get github.com/devlocker/tulpa
+go get github.com/jeffrom/tulpa
 ```
 
 ### Windows
