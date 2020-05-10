@@ -23,11 +23,13 @@ type Config struct {
 	Debounce   time.Duration
 	// DebouncePoll is the interval between watches while the request debouncer
 	// is saturated. It will be disabled if <= 0.
-	DebouncePoll time.Duration
-	Wait         bool
-	Verbose      bool
-	stdout       io.Writer
-	stderr       io.Writer
+	DebouncePoll  time.Duration
+	Latency       time.Duration
+	LatencyJitter time.Duration
+	Wait          bool
+	Verbose       bool
+	stdout        io.Writer
+	stderr        io.Writer
 }
 
 func (c *Config) Initialize() {

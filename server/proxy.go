@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -111,8 +112,9 @@ func (p *proxy) forward(w http.ResponseWriter, r *http.Request, body string) boo
 		return true
 	}
 
-	r.Body = &stringReader{Reader: strings.NewReader(body)}
+	p.handleLatency(r.Context())
 
+	r.Body = &stringReader{Reader: strings.NewReader(body)}
 	writer := &proxyWriter{res: w}
 	p.rp.ServeHTTP(writer, r)
 	// fmt.Println("proxyWriter.status", writer.status)
@@ -120,6 +122,29 @@ func (p *proxy) forward(w http.ResponseWriter, r *http.Request, body string) boo
 	// If the request is "successful" - as in the server responded in
 	// some way, return the response to the client.
 	return writer.status != http.StatusBadGateway
+}
+
+func (p *proxy) handleLatency(ctx context.Context) {
+	latency := p.cfg.Latency
+	jitter := p.cfg.LatencyJitter
+	if latency <= 0 {
+		return
+	}
+
+	r := time.Duration(rand.Intn(int(jitter)))
+	if rand.Intn(1) == 0 {
+		r *= -1
+	}
+	dur := latency + r
+	if dur <= 0 {
+		return
+	}
+
+	p.cfg.Printf("adding latency: %s", dur)
+	err := sleepContext(ctx, dur)
+	if err != nil {
+		p.cfg.Printf("sleep error: %v", err)
+	}
 }
 
 func (p *proxy) setError(err error) {
@@ -163,3 +188,14 @@ type stringReader struct {
 }
 
 func (r *stringReader) Close() error { return nil }
+
+func sleepContext(ctx context.Context, d time.Duration) error {
+	timer := time.NewTimer(d)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
