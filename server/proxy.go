@@ -141,7 +141,10 @@ func (p *proxy) handleLatency(ctx context.Context) {
 	}
 
 	p.cfg.Printf("adding latency: %s", dur)
-	sleepContext(ctx, dur)
+	err := sleepContext(ctx, dur)
+	if err != nil {
+		p.cfg.Printf("sleep error: %v", err)
+	}
 }
 
 func (p *proxy) setError(err error) {
