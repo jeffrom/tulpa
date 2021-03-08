@@ -37,8 +37,9 @@ func newRootCmd() *cobra.Command {
 	flags.DurationVar(&cfg.DebouncePoll, "debounce-poll", 1*time.Second, "poll interval while debounce is saturated")
 	flags.DurationVar(&cfg.Latency, "latency", 0, "Duration to wait to respond to requests")
 	flags.DurationVar(&cfg.LatencyJitter, "latency-jitter", 2*time.Second, "introduce randomness to latency duration")
-	flags.StringArrayVarP(&cfg.IgnoreDirs, "ignore", "x", []string{"node_modules", "log", "tmp", "vendor"}, "directories to ignore")
+	flags.StringArrayVarP(&cfg.IgnoreDirs, "ignore", "x", []string{"node_modules", "log", "tmp", "vendor", ".make"}, "directories to ignore")
 	flags.BoolVarP(&cfg.Wait, "wait", "w", false, "wait for command to finish before serving request")
+	flags.BoolVarP(&cfg.Verbose, "verbose", "v", false, "print extra debugging info")
 
 	return rootCmd
 }
