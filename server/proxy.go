@@ -55,7 +55,7 @@ func (p *proxy) start(ready chan error) error {
 		},
 	}
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", "localhost", p.cfg.ProxyPort))
+	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", "0.0.0.0", p.cfg.ProxyPort))
 	if err != nil {
 		return err
 	}
